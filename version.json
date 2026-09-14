@@ -1,0 +1,15 @@
+{
+  "version": "1.5.0",
+  "name": "lsuperagen",
+  "description": "Enterprise-grade AI development platform",
+  "released": "2026-09-14",
+  "artifact": "https://claude.ai/code/artifact/728f56cf-2c6f-4376-ae56-14ee4d246dea",
+  "documentation": "docs/index.html",
+  "status": "stable",
+  "features": [
+    "Parallel execution engine",
+    "Workflow templates and reusable components",
+    "Enhanced observability with execution traces",
+    "Improved error reporting and debugging tools"
+  ]
+}
