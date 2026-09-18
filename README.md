@@ -71,4 +71,4 @@ Once the Superagent app is published, the bridge is reachable at:
 
 ---
 
-*This section was added by Thanabat's Superagent on Base44 (`AGENTS.SDK.MODEL`) — the personal AI agent that built and deployed the bridge on 14 September 2026.*
+*This section was added by Thanabat's Superagent on Base44 (`AGENTS.SDK.MODEL`) — the personal AI agent that built and deployed the bridge on 14 September 2026.* 
