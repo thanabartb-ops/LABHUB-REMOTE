@@ -856,17 +856,10 @@
         <nav id="main-nav">
           <a href="#" data-page="home" class="nav-link active">Docs</a>
           <a href="#" data-page="quick-start" class="nav-link">Getting Started</a>
-          <a href="#" data-page="guides" class="nav-link">Guides</a>
-          <a href="#" data-page="api-reference" class="nav-link">API</a>
-          <a href="#" data-page="examples" class="nav-link">Examples</a>
           <a href="#" data-page="changelog" class="nav-link">Changelog</a>
         </nav>
         <div class="header-controls">
-          <div class="search-box">
-            <span class="search-icon">🔍</span>
-            <input type="text" placeholder="Search..." id="search-input">
-          </div>
-          <button class="mobile-menu-button" id="mobile-menu">
+          <button class="mobile-menu-button" id="mobile-menu" aria-label="Toggle navigation menu" aria-controls="main-nav" aria-expanded="false">
             <span></span>
             <span></span>
             <span></span>
@@ -881,39 +874,11 @@
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-section">
-        <span class="sidebar-title">Getting Started</span>
+        <span class="sidebar-title">Documentation</span>
         <ul class="sidebar-list">
+          <li class="sidebar-item"><a href="#" data-page="home" class="sidebar-link">Home</a></li>
           <li class="sidebar-item"><a href="#" data-page="quick-start" class="sidebar-link">Quick Start</a></li>
-          <li class="sidebar-item"><a href="#" data-page="installation" class="sidebar-link">Installation</a></li>
-          <li class="sidebar-item"><a href="#" data-page="configuration" class="sidebar-link">Configuration</a></li>
-        </ul>
-      </div>
-
-      <div class="sidebar-section">
-        <span class="sidebar-title">Guides</span>
-        <ul class="sidebar-list">
-          <li class="sidebar-item"><a href="#" data-page="core-concepts" class="sidebar-link">Core Concepts</a></li>
-          <li class="sidebar-item"><a href="#" data-page="deployment" class="sidebar-link">Deployment</a></li>
-          <li class="sidebar-item"><a href="#" data-page="optimization" class="sidebar-link">Optimization</a></li>
-          <li class="sidebar-item"><a href="#" data-page="security" class="sidebar-link">Security</a></li>
-        </ul>
-      </div>
-
-      <div class="sidebar-section">
-        <span class="sidebar-title">Reference</span>
-        <ul class="sidebar-list">
-          <li class="sidebar-item"><a href="#" data-page="api-reference" class="sidebar-link">API Reference</a></li>
-          <li class="sidebar-item"><a href="#" data-page="cli" class="sidebar-link">CLI Reference</a></li>
-          <li class="sidebar-item"><a href="#" data-page="schemas" class="sidebar-link">Schemas</a></li>
-        </ul>
-      </div>
-
-      <div class="sidebar-section">
-        <span class="sidebar-title">Resources</span>
-        <ul class="sidebar-list">
-          <li class="sidebar-item"><a href="#" data-page="examples" class="sidebar-link">Examples</a></li>
           <li class="sidebar-item"><a href="#" data-page="changelog" class="sidebar-link">Changelog</a></li>
-          <li class="sidebar-item"><a href="#" data-page="faq" class="sidebar-link">FAQ</a></li>
         </ul>
       </div>
     </aside>
@@ -1100,28 +1065,22 @@ cd my-project</code></pre>
     <div class="container">
       <div class="footer-content">
         <div class="footer-section">
-          <h4>Product</h4>
+          <h4>Documentation</h4>
+          <a href="#" data-page="home">Home</a>
           <a href="#" data-page="quick-start">Getting Started</a>
-          <a href="#" data-page="deployment">Deployment</a>
-          <a href="#" data-page="pricing">Pricing</a>
+          <a href="#" data-page="changelog">Changelog</a>
         </div>
         <div class="footer-section">
           <h4>Resources</h4>
-          <a href="#" data-page="documentation">Documentation</a>
-          <a href="#" data-page="examples">Examples</a>
-          <a href="#" data-page="faq">FAQ</a>
+          <p>Additional documentation and guides coming soon</p>
         </div>
         <div class="footer-section">
-          <h4>Company</h4>
-          <a href="#">About</a>
-          <a href="#">Blog</a>
-          <a href="#">Contact</a>
+          <h4>Platform</h4>
+          <p>Enterprise-grade AI development platform version 1.5.0</p>
         </div>
         <div class="footer-section">
-          <h4>Legal</h4>
-          <a href="#">Privacy</a>
-          <a href="#">Terms</a>
-          <a href="#">License</a>
+          <h4>Support</h4>
+          <p>Visit our documentation for help and guidance</p>
         </div>
       </div>
       <div class="footer-bottom">
@@ -1133,16 +1092,19 @@ cd my-project</code></pre>
 
   <script>
     function navigateTo(page) {
+      // Validate target page exists
+      const targetPage = document.getElementById('page-' + page);
+      if (!targetPage) {
+        return;
+      }
+
       // Hide all pages
       document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active'));
 
       // Show target page
-      const targetPage = document.getElementById('page-' + page);
-      if (targetPage) {
-        targetPage.classList.add('active');
-      }
+      targetPage.classList.add('active');
 
       // Update active states
       document.querySelectorAll(`[data-page="${page}"]`).forEach(el => {
@@ -1163,8 +1125,11 @@ cd my-project</code></pre>
     }
 
     // Handle mobile menu
-    document.getElementById('mobile-menu')?.addEventListener('click', () => {
-      document.getElementById('main-nav').classList.toggle('open');
+    const mobileMenuBtn = document.getElementById('mobile-menu');
+    mobileMenuBtn?.addEventListener('click', () => {
+      const nav = document.getElementById('main-nav');
+      nav.classList.toggle('open');
+      mobileMenuBtn.setAttribute('aria-expanded', nav.classList.contains('open'));
     });
 
     // Handle navigation clicks
