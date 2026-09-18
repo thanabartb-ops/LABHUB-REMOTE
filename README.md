@@ -48,7 +48,7 @@ Once the Superagent app is published, the bridge is reachable at:
 
 | Method | Behavior |
 | --- | --- |
-| `initialize` | Returns server capabilities (`tools`) and a session id |
+| `initialize` | Echoes the requested protocol version (default `2025-03-26`), returns capabilities (`tools`) and server info (`base44-superagent-bridge` v1.0.0). No session id is issued |
 | `ping` | Returns `{}` |
 | `tools/list` | Returns the `message_agent` tool with its input schema |
 | `tools/call` | Executes `message_agent` and returns the agent reply as text |
@@ -65,6 +65,7 @@ Once the Superagent app is published, the bridge is reachable at:
 ### Notes and caveats
 
 - The Superagent runs a full agent loop; a reply can take from seconds to a few minutes if the agent performs tool work.
+- Batch JSON-RPC requests (arrays of messages) are supported; notifications receive no response. `GET` returns `405`; `DELETE` (session termination) returns `200`.
 - Messages sent through the bridge appear in the owner's Superagent conversation.
 - The bridge is a fallback/complement to native App MCP; keep this document in sync with `functions/mcpBridge.ts` when the bridge changes.
 
