@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>LSUPERAGEN Tools Console</title>
+<meta name="description" content="Owner and developer workspace: real client-side tools for the LSUPERAGEN platform. No mock data, no fake status, no exposed secrets.">
+<style>
+  :root{
+    --bg:#0b0d10; --panel:#12151a; --line:#2a2f36; --line2:#1d2127;
+    --txt:#e7eaee; --dim:#9aa3ad; --faint:#6b737d;
+    --blue:#4d9fff; --blue-deep:#2563eb; --green:#3ecf8e; --red:#ff6b6b; --amber:#e6b450;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--txt);
+    font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:480px;margin:0 auto;padding:14px 12px 60px}
+  @media(min-width:820px){ .wrap{max-width:900px} .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start} }
+  a{color:var(--blue);text-decoration:none}
+  a:hover{text-decoration:underline}
+  header.top{border:1px solid var(--line);background:linear-gradient(180deg,#141821,#0e1116);border-radius:12px;padding:14px;margin-bottom:14px}
+  .brand{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .brand h1{font-size:18px;margin:0;letter-spacing:.14em}
+  .brand .sub{font-size:13px;color:var(--dim)}
+  .tag{display:inline-block;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);border:1px solid var(--line);border-radius:999px;padding:2px 8px;margin-top:8px}
+  .hbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .hbtns a,.btn{
+    font-size:13px;color:var(--txt);border:1px solid var(--line);border-radius:8px;
+    padding:7px 12px;background:#171b22;display:inline-block;cursor:pointer;
+  }
+  .hbtns a:hover,.btn:hover{border-color:#3a4150;text-decoration:none}
+  .btn.primary{background:var(--blue-deep);border-color:var(--blue-deep);color:#fff}
+  .btn.mini{padding:4px 9px;font-size:12px}
+  h2.sec{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:22px 2px 8px;border-bottom:1px solid var(--line2);padding-bottom:6px}
+  .card{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:12px;margin-bottom:12px}
+  .card h3{margin:0;font-size:14px}
+  .card .purpose{margin:4px 0 10px;color:var(--dim);font-size:12.5px}
+  .chip{display:inline-block;font-size:10px;letter-spacing:.06em;border:1px solid var(--line);color:var(--dim);border-radius:999px;padding:1px 7px;vertical-align:middle;margin-left:6px}
+  .chip.live{color:var(--green);border-color:#274a3a}
+  .chip.local{color:var(--amber);border-color:#4a3f27}
+  textarea,input[type=text],input[type=url]{
+    width:100%;background:#0c0f13;color:var(--txt);border:1px solid var(--line);
+    border-radius:8px;padding:9px;font:13px/1.5 var(--mono);resize:vertical;min-height:74px;
+  }
+  input[type=text],input[type=url]{min-height:0}
+  textarea:focus,input:focus{outline:1px solid var(--blue);border-color:var(--blue)}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;align-items:center}
+  .out{
+    margin-top:10px;background:#0c0f13;border:1px solid var(--line2);border-radius:8px;
+    padding:10px;font:12px/1.6 var(--mono);white-space:pre-wrap;word-break:break-word;
+    min-height:40px;color:#cfd6de;
+  }
+  .out:empty{display:none}
+  .out.pass{border-color:#274a3a}
+  .out.fail{border-color:#4a2727}
+  .chk{display:flex;align-items:center;gap:9px;padding:8px 4px;border-bottom:1px solid var(--line2)}
+  .chk:last-child{border-bottom:none}
+  .chk label{flex:1}
+  .chk select{background:#0c0f13;color:var(--txt);border:1px solid var(--line);border-radius:6px;padding:4px 6px;font-size:12px}
+  .prog{height:5px;border-radius:99px;background:#1a1f27;margin:10px 0 4px;overflow:hidden}
+  .prog>span{display:block;height:100%;background:var(--blue-deep);width:0;transition:width .3s}
+  table.map{width:100%;border-collapse:collapse;font-size:12.5px}
+  table.map th{color:var(--faint);text-align:left;font-weight:500;padding:6px;border-bottom:1px solid var(--line)}
+  table.map td{padding:7px 6px;border-bottom:1px solid var(--line2);vertical-align:top}
+  td.route{font-family:var(--mono);white-space:nowrap}
+  .st{display:inline-block;font-size:10px;letter-spacing:.05em;border-radius:5px;padding:2px 7px;border:1px solid}
+  .st.public{color:var(--blue);border-color:#24405f}
+  .st.owner{color:var(--amber);border-color:#4a3f27}
+  .st.api{color:var(--green);border-color:#274a3a}
+  .note{color:var(--faint);font-size:11.5px;margin-top:8px}
+  footer{margin-top:26px;color:var(--faint);font-size:11.5px;border-top:1px solid var(--line2);padding-top:12px}
+  [hidden]{display:none !important}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="brand">
+    <h1>LSUPERAGEN</h1>
+    <span class="sub">Tools Console</span>
+  </div>
+  <div class="tag">Owner / Developer Workspace</div>
+  <div class="hbtns">
+    <a href="/">Public Site</a>
+    <a href="/chat">Chat</a>
+    <a href="/dev">Dev Login</a>
+  </div>
+</header>
+
+<h2 class="sec">AI Runtime Tools</h2>
+<div class="grid">
+  <article class="card">
+    <h3>Public Chat <span class="chip live">real endpoint call</span></h3>
+    <p class="purpose">Sends your message to the existing POST /api/chat route and shows the real response. No simulated replies.</p>
+    <textarea id="chatIn" aria-label="Message for /api/chat" placeholder="Message to send to /api/chat"></textarea>
+    <div class="row">
+      <button class="btn primary" id="chatRun">Send via /api/chat</button>
+      <button class="btn mini" data-clear="chatIn chatOut">Clear</button>
+    </div>
+    <div class="out" id="chatOut" aria-live="polite"></div>
+  </article>
+
+  <article class="card">
+    <h3>Code Assistant <span class="chip">client-side</span></h3>
+    <p class="purpose">Builds a structured code-assistance prompt from your notes. Runs entirely in your browser.</p>
+    <textarea id="codeIn" aria-label="Code problem description" placeholder="Describe the code problem or paste a snippet to discuss"></textarea>
+    <div class="row">
+      <button class="btn primary" id="codeRun">Build prompt</button>
+      <button class="btn mini" id="codeCopy" hidden>Copy prompt</button>
+      <button class="btn mini" data-clear="codeIn codeOut">Clear</button>
+    </div>
+    <div class="out" id="codeOut" aria-live="polite"></div>
+  </article>
+
+  <article class="card">
+    <h3>Image Prompt Builder <span class="chip">client-side</span></h3>
+    <p class="purpose">Turns a rough idea into a structured image-generation prompt. No image is generated here.</p>
+    <textarea id="imgIn" aria-label="Image idea" placeholder="Rough idea, e.g. dark dashboard hero, blue accents"></textarea>
+    <div class="row">
+      <button class="btn primary" id="imgRun">Build prompt</button>
+      <button class="btn mini" id="imgCopy" hidden>Copy prompt</button>
+      <button class="btn mini" data-clear="imgIn imgOut">Clear</button>
+    </div>
+    <div class="out" id="imgOut" aria-live="polite"></div>
+  </article>
+
+  <article class="card">
+    <h3>Deep Research Prompt Builder <span class="chip">client-side</span></h3>
+    <p class="purpose">Builds a research brief template with scope, questions, and evidence rules. No research is performed here.</p>
+    <textarea id="resIn" aria-label="Research topic" placeholder="Topic or question to research"></textarea>
+    <div class="row">
+      <button class="btn primary" id="resRun">Build brief</button>
+      <button class="btn mini" id="resCopy" hidden>Copy brief</button>
+      <button class="btn mini" data-clear="resIn resOut">Clear</button>
+    </div>
+    <div class="out" id="resOut" aria-live="polite"></div>
+  </article>
+</div>
+
+<h2 class="sec">Secret and Config Tools</h2>
+<div class="grid">
+  <article class="card">
+    <h3>Secret Handoff Converter <span class="chip">client-side</span></h3>
+    <p class="purpose">Converts a pasted config or .env block into a handoff-safe version. Secret values become placeholders. Nothing leaves your browser. See the <a href="/secret-handoff">secret handoff route</a>.</p>
+    <textarea id="shIn" aria-label="Config to convert" placeholder="Paste KEY=value lines or a config file"></textarea>
+    <div class="row">
+      <button class="btn primary" id="shRun">Convert to handoff-safe</button>
+      <button class="btn mini" id="shCopy" hidden>Copy safe output</button>
+      <button class="btn mini" data-clear="shIn shOut">Clear</button>
+    </div>
+    <div class="out" id="shOut" aria-live="polite"></div>
+  </article>
+
+  <article class="card">
+    <h3>Code Drop Redactor <span class="chip">client-side</span></h3>
+    <p class="purpose">Scans pasted code or text and masks API keys, tokens, JWTs, and query-string credentials before you share a code drop. See <a href="/dev-code-drop.html">dev code drop</a>.</p>
+    <textarea id="rdIn" aria-label="Code to redact" placeholder="Paste code or text to redact"></textarea>
+    <div class="row">
+      <button class="btn primary" id="rdRun">Redact and preview</button>
+      <button class="btn mini" id="rdCopy" hidden>Copy-safe-output</button>
+      <button class="btn mini" data-clear="rdIn rdOut">Clear</button>
+    </div>
+    <div class="out" id="rdOut" aria-live="polite"></div>
+  </article>
+
+  <article class="card">
+    <h3>Provider Connect Checklist <span class="chip local">owner local</span></h3>
+    <p class="purpose">Track connection status per provider. Saved in this browser only (localStorage). See the <a href="/provider-connect">provider connect route</a>.</p>
+    <div id="pcList"></div>
+    <div class="prog" role="progressbar" aria-label="Connected progress"><span id="pcBar"></span></div>
+    <div class="note" id="pcSummary"></div>
+    <div class="row">
+      <input type="text" id="pcNew" aria-label="Provider name" placeholder="Provider name" style="flex:1;min-width:120px">
+      <button class="btn primary mini" id="pcAdd">Add provider</button>
+      <button class="btn mini" id="pcReset">Reset list</button>
+    </div>
+    <div class="note">Default entries are the real dependencies used by this console. Add or remove freely.</div>
+  </article>
+</div>
+
+<h2 class="sec">Zapier MCP Tools</h2>
+<div class="grid">
+  <article class="card">
+    <h3>ChatGPT Zapier MCP Config <span class="chip local">owner local reference</span></h3>
+    <p class="purpose">Stores your Zapier MCP config URL in this browser's localStorage only. It is never rendered in full, never sent anywhere, and never written into shared files.</p>
+    <input type="url" id="zmUrl" aria-label="Zapier MCP config URL" placeholder="Paste your Zapier MCP config URL (stays local)">
+    <div class="row">
+      <button class="btn primary" id="zmSave">Save locally</button>
+      <button class="btn mini" id="zmDel" hidden>Remove stored reference</button>
+    </div>
+    <div class="out" id="zmOut" aria-live="polite"></div>
+  </article>
+
+  <article class="card">
+    <h3>MCP Client Template Generator <span class="chip">client-side</span></h3>
+    <p class="purpose">Generates a Streamable HTTP MCP client config template. No private URL is hardcoded; the URL field is a placeholder for the owner's local reference.</p>
+    <div class="row">
+      <label style="color:var(--dim);font-size:12.5px"><input type="checkbox" id="mcUseSaved"> Insert my saved local URL into the copied template (never shown on screen)</label>
+    </div>
+    <div class="row">
+      <button class="btn primary" id="mcRun">Generate template</button>
+      <button class="btn mini" id="mcCopy" hidden>Copy template</button>
+      <button class="btn mini" data-clear="mcOut">Clear</button>
+    </div>
+    <div class="out" id="mcOut" aria-live="polite"></div>
+  </article>
+
+  <article class="card">
+    <h3>Zapier Export Inspector <span class="chip">client-side</span></h3>
+    <p class="purpose">Parses a pasted Zapier export JSON and lists zaps, triggers, and actions with auth values masked. No export data is uploaded.</p>
+    <textarea id="ziIn" aria-label="Zapier export JSON" placeholder="Paste Zapier export JSON"></textarea>
+    <div class="row">
+      <button class="btn primary" id="ziRun">Inspect export</button>
+      <button class="btn mini" id="ziCopy" hidden>Copy safe summary</button>
+      <button class="btn mini" data-clear="ziIn ziOut">Clear</button>
+    </div>
+    <div class="out" id="ziOut" aria-live="polite"></div>
+  </article>
+</div>
+
+<h2 class="sec">Control Plane Tools</h2>
+<p class="note" style="margin:0 2px 10px">Evidence levels: OBSERVED (seen directly), DECLARED (stated by an authority), VALIDATED (verified against provider logs), INFERRED (derived, not proven). These validators never mark a deployment verified without a provider log reference, and never mark work done without validated evidence.</p>
+<div class="grid">
+  <article class="card">
+    <h3>Evidence Contract Checker</h3>
+    <p class="purpose">Checks a JSON array of evidence entries for required fields per evidence level. Pass or fail with reasons.</p>
+    <textarea id="ecIn" aria-label="Evidence entries JSON" placeholder='[{"claim":"...","level":"OBSERVED","logRef":"...","detail":"..."}]'></textarea>
+    <div class="row">
+      <button class="btn primary" id="ecRun">Check contract</button>
+      <button class="btn mini" data-clear="ecIn ecOut">Clear</button>
+    </div>
+    <div class="out" id="ecOut" aria-live="polite"></div>
+  </article>
+
+  <article class="card">
+    <h3>Deployment Verification Gate</h3>
+    <p class="purpose">A deployment record passes only when it carries a provider, a deployment id, and a provider log reference. Without a log reference this gate always fails.</p>
+    <textarea id="dvIn" aria-label="Deployment record JSON" placeholder='{"resource":"...","provider":"...","deploymentId":"...","logUrl":"...","status":"ready"}'></textarea>
+    <div class="row">
+      <button class="btn primary" id="dvRun">Run gate</button>
+      <button class="btn mini" data-clear="dvIn dvOut">Clear</button>
+    </div>
+    <div class="out" id="dvOut" aria-live="polite"></div>
+  </article>
+
+  <article class="card">
+    <h3>Declare Done Validator</h3>
+    <p class="purpose">Rejects done declarations that lack at least one VALIDATED evidence reference. Output includes pass or fail and reasons.</p>
+    <textarea id="ddIn" aria-label="Done declaration JSON" placeholder='{"task":"...","done":true,"evidence":[{"level":"VALIDATED","ref":"..."}]}'></textarea>
+    <div class="row">
+      <button class="btn primary" id="ddRun">Validate declaration</button>
+      <button class="btn mini" data-clear="ddIn ddOut">Clear</button>
+    </div>
+    <div class="out" id="ddOut" aria-live="polite"></div>
+  </article>
+
+  <article class="card">
+    <h3>Authority Conflict Detector</h3>
+    <p class="purpose">Detects resources where different authorities declare different states. Conflicts are listed with the authorities involved.</p>
+    <textarea id="acIn" aria-label="Authority declarations JSON" placeholder='[{"authority":"ci","resource":"deploy","state":"ready"},{"authority":"monitor","resource":"deploy","state":"failed"}]'></textarea>
+    <div class="row">
+      <button class="btn primary" id="acRun">Detect conflicts</button>
+      <button class="btn mini" data-clear="acIn acOut">Clear</button>
+    </div>
+    <div class="out" id="acOut" aria-live="polite"></div>
+  </article>
+</div>
+
+<h2 class="sec">Endpoint Map</h2>
+<article class="card">
+  <table class="map" aria-label="Endpoint map">
+    <thead><tr><th>Route</th><th>Type</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td class="route">/</td><td>Public site</td><td><span class="st public">Public</span></td></tr>
+      <tr><td class="route">/chat</td><td>Chat page</td><td><span class="st public">Public</span></td></tr>
+      <tr><td class="route">/tools</td><td>Tools page</td><td><span class="st public">Public</span></td></tr>
+      <tr><td class="route">/examples</td><td>Examples</td><td><span class="st public">Public</span></td></tr>
+      <tr><td class="route">/dev</td><td>Developer console</td><td><span class="st owner">Owner-only</span></td></tr>
+      <tr><td class="route">/dev/tools</td><td>This console</td><td><span class="st owner">Owner-only</span></td></tr>
+      <tr><td class="route">/secret-handoff</td><td>Secret handoff</td><td><span class="st owner">Owner-only</span></td></tr>
+      <tr><td class="route">/provider-connect</td><td>Provider connect</td><td><span class="st owner">Owner-only</span></td></tr>
+      <tr><td class="route">/dev-code-drop.html</td><td>Code drop</td><td><span class="st owner">Owner-only</span></td></tr>
+      <tr><td class="route">/system-registry.html</td><td>System registry</td><td><span class="st owner">Owner-only</span></td></tr>
+      <tr><td class="route">/endpoints</td><td>Endpoint listing</td><td><span class="st owner">Owner-only</span></td></tr>
+      <tr><td class="route">/api/auth/session</td><td>Auth session</td><td><span class="st api">API</span></td></tr>
+      <tr><td class="route">/api/chat</td><td>Chat endpoint</td><td><span class="st api">API</span></td></tr>
+      <tr><td class="route">/api/dev/status</td><td>Dev status</td><td><span class="st api">API</span></td></tr>
+      <tr><td class="route">/api/admin/status</td><td>Admin status</td><td><span class="st api">API</span></td></tr>
+    </tbody>
+  </table>
+  <div class="note">Status labels reflect the current route map of this console's scope. /dev was confirmed owner-gated by an authenticated redirect on 18 September 2026. Live probe results below are the real responses from this origin.</div>
+  <div class="row">
+    <button class="btn mini" data-probe="/api/auth/session">Probe /api/auth/session</button>
+    <button class="btn mini" data-probe="/api/dev/status">Probe /api/dev/status</button>
+    <button class="btn mini" data-probe="/api/admin/status">Probe /api/admin/status</button>
+  </div>
+  <div class="out" id="probeOut" aria-live="polite"></div>
+</article>
+
+<footer>
+  LSUPERAGEN Tools Console. All tools on this page run client-side in your browser. Owner-local values stay in this browser's localStorage. No secrets are stored, transmitted, or rendered in full. Any integration that is not connected shows "Not wired yet" instead of simulated output.
+</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  function $(s){ return document.querySelector(s); }
+  function setOut(id, text, kind){
+    var el = $("#" + id);
+    el.textContent = text;
+    el.className = "out" + (kind ? " " + kind : "");
+  }
+
+  document.querySelectorAll("[data-clear]").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      btn.getAttribute("data-clear").split(" ").forEach(function(id){
+        var el = $("#" + id);
+        if(!el) return;
+        if(el.tagName === "TEXTAREA" || el.tagName === "INPUT") el.value = "";
+        else el.textContent = "";
+      });
+    });
+  });
+
+  function copyText(text, done){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ done(true); }, function(){ done(false); });
+    } else { done(false); }
+  }
+  function bindCopy(btnId, getText){
+    var btn = $("#" + btnId);
+    var base = btn.textContent;
+    btn.addEventListener("click", function(){
+      var t = getText();
+      if(!t) return;
+      copyText(t, function(ok){
+        btn.textContent = ok ? "Copied" : "Copy failed";
+        setTimeout(function(){ btn.textContent = base; }, 1600);
+      });
+    });
+  }
+
+  /* ---------- Redaction engine (client-side only) ---------- */
+  var PATTERNS = [
+    { re: /\bBearer\s+[A-Za-z0-9._~+\/=-]{8,}/gi, out: "Bearer __REDACTED__" },
+    { re: /\bsk-[A-Za-z0-9-]{16,}/g, out: "sk-__REDACTED__" },
+    { re: /\bgh[pousr]_[A-Za-z0-9]{16,}/g, out: "__REDACTED_GITHUB_TOKEN__" },
+    { re: /\bAKIA[0-9A-Z]{16}\b/g, out: "__REDACTED_AWS_KEY__" },
+    { re: /\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\b/g, out: "__REDACTED_JWT__" },
+    { re: /\bxox[baprs]-[A-Za-z0-9-]{10,}/g, out: "__REDACTED_SLACK_TOKEN__" },
+    { re: /\b[a-f0-9]{32,}\b/gi, out: "__REDACTED_HEX__" },
+    { re: /([?&](api_?key|key|token|access_token|client_secret|sig|signature)=)[^&\s"'<]+/gi, out: "$1__REDACTED__" },
+    { re: /((?:secret|password|token|api[_-]?key|credential)\s*[:=]\s*["']?)[^\s"',;]+/gi, out: "$1__REDACTED__" }
+  ];
+  function redact(text){
+    var out = text, hits = 0;
+    PATTERNS.forEach(function(p){
+      out = out.replace(p.re, function(){
+        hits++;
+        var m = arguments[0], g1 = arguments[1];
+        return p.out.replace("$1", g1 !== undefined ? g1 : "");
+      });
+    });
+    return { text: out, hits: hits };
+  }
+
+  /* ---------- A. AI Runtime ---------- */
+
+  $("#chatRun").addEventListener("click", function(){
+    var msg = $("#chatIn").value.trim();
+    if(!msg){ setOut("chatOut", "Enter a message first."); return; }
+    setOut("chatOut", "Calling POST /api/chat ...");
+    fetch("/api/chat", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: msg })
+    }).then(function(res){
+      if(!res.ok){
+        setOut("chatOut", "Not wired yet from this session: /api/chat responded HTTP " + res.status +
+          ((res.status === 401 || res.status === 403) ? " (sign in via /dev may be required)." : "."));
+        return null;
+      }
+      return res.text();
+    }).then(function(body){
+      if(body === null) return;
+      setOut("chatOut", body.length > 4000 ? body.slice(0, 4000) + " ...[truncated]" : body);
+    }).catch(function(err){
+      setOut("chatOut", "Not wired yet: fetch to /api/chat failed from this context.\n" + err.message);
+    });
+  });
+
+  var codePrompt = "";
+  $("#codeRun").addEventListener("click", function(){
+    var raw = $("#codeIn").value.trim();
+    if(!raw){ setOut("codeOut", "Describe the problem or paste a snippet first."); return; }
+    codePrompt =
+      "TASK: assist with the code described below.\n\n" +
+      "CONTEXT:\n" + raw + "\n\n" +
+      "REQUIREMENTS:\n" +
+      "1. Identify the exact issue or the requested change.\n" +
+      "2. Provide a corrected or new snippet only where needed.\n" +
+      "3. State assumptions explicitly; do not invent APIs.\n" +
+      "4. Flag security issues such as exposed secrets or unsafe evaluation.\n";
+    setOut("codeOut", codePrompt);
+    $("#codeCopy").hidden = false;
+  });
+  bindCopy("codeCopy", function(){ return codePrompt; });
+
+  var imgPrompt = "";
+  $("#imgRun").addEventListener("click", function(){
+    var raw = $("#imgIn").value.trim();
+    if(!raw){ setOut("imgOut", "Enter a rough idea first."); return; }
+    imgPrompt =
+      "SUBJECT: " + raw + "\n" +
+      "STYLE: minimal, premium developer aesthetic, matte black and graphite palette, thin chrome lines, small blue accents\n" +
+      "COMPOSITION: mobile-first 9:16 framing, centered subject, generous negative space\n" +
+      "CONSTRAINTS: no text artifacts, no fake analytics, no stock-photo look, high contrast, readable at small sizes\n";
+    setOut("imgOut", imgPrompt);
+    $("#imgCopy").hidden = false;
+  });
+  bindCopy("imgCopy", function(){ return imgPrompt; });
+
+  var resBrief = "";
+  $("#resRun").addEventListener("click", function(){
+    var raw = $("#resIn").value.trim();
+    if(!raw){ setOut("resOut", "Enter a topic or question first."); return; }
+    resBrief =
+      "RESEARCH BRIEF\n" +
+      "TOPIC: " + raw + "\n\n" +
+      "SCOPE: define what is in scope and out of scope before gathering sources.\n" +
+      "KEY QUESTIONS:\n" +
+      "1. What is the current verified state of the topic?\n" +
+      "2. What primary sources or provider documentation confirm it?\n" +
+      "3. What remains unverified or inferred?\n\n" +
+      "EVIDENCE RULES:\n" +
+      "- Label every finding OBSERVED, DECLARED, VALIDATED, or INFERRED.\n" +
+      "- Attach a source or log reference to each finding.\n" +
+      "- Do not present a planned or unavailable capability as working.\n";
+    setOut("resOut", resBrief);
+    $("#resCopy").hidden = false;
+  });
+  bindCopy("resCopy", function(){ return resBrief; });
+
+  /* ---------- B. Secret and Config ---------- */
+
+  var SECRET_NAME = /(secret|token|pass(word)?|api[_-]?key|access[_-]?key|private[_-]?key|credential|auth|signature|session)/i;
+  function looksSecret(name, value){
+    if(SECRET_NAME.test(name)) return true;
+    if(/^[A-Za-z0-9_\/+=.~:-]{12,}$/.test(value) && /[0-9]/.test(value) && /[A-Za-z]/.test(value)) return true;
+    return false;
+  }
+
+  var shResult = "";
+  $("#shRun").addEventListener("click", function(){
+    var raw = $("#shIn").value;
+    if(!raw.trim()){ setOut("shOut", "Paste a config or .env block first."); return; }
+    var lines = raw.split(/\r?\n/);
+    var masked = [], flagged = [];
+    lines.forEach(function(line){
+      var m = line.match(/^\s*([A-Za-z0-9_.\-]+)\s*[:=]\s*(.*)$/);
+      if(m){
+        var name = m[1], val = m[2].replace(/^["']/, "").replace(/["'],?$/, "");
+        if(looksSecret(name, val)){
+          masked.push(name + "=__SET_VIA_OWNER_SECRET__");
+          flagged.push(name);
+        } else { masked.push(line); }
+      } else if(line.trim() === "" || /^\s*(#|\/\/)/.test(line)){
+        masked.push(line);
+      } else {
+        masked.push(redact(line).text);
+      }
+    });
+    shResult = masked.join("\n");
+    var head = flagged.length
+      ? flagged.length + " secret value(s) replaced with placeholders: " + flagged.join(", ") + "\n\n"
+      : "No secret-like values were detected in this input. Double-check before sharing.\n\n";
+    setOut("shOut", head + shResult);
+    $("#shCopy").hidden = false;
+  });
+  bindCopy("shCopy", function(){ return shResult; });
+
+  var rdResult = "";
+  $("#rdRun").addEventListener("click", function(){
+    var raw = $("#rdIn").value;
+    if(!raw.trim()){ setOut("rdOut", "Paste code or text to redact first."); return; }
+    var r = redact(raw);
+    rdResult = r.text;
+    var head = (r.hits > 0)
+      ? r.hits + " credential-like value(s) masked. Masked preview only.\n\n"
+      : "No credential-like values matched known patterns. Preview is unchanged; verify manually before sharing.\n\n";
+    setOut("rdOut", head + rdResult);
+    $("#rdCopy").hidden = false;
+  });
+  bindCopy("rdCopy", function(){ return rdResult; });
+
+  /* Provider Connect Checklist */
+  var PC_KEY = "lsg.owner.providerChecklist";
+  var DEFAULT_PC = [
+    { name: "Chat API (/api/chat)", status: "unverified" },
+    { name: "Google sign-in (/api/auth/session)", status: "unverified" },
+    { name: "Zapier MCP (owner local reference)", status: "unverified" }
+  ];
+  var STATUSES = ["unverified", "connected", "blocked", "not-needed"];
+  function pcLoad(){
+    try{ return JSON.parse(localStorage.getItem(PC_KEY)) || null; }catch(e){ return null; }
+  }
+  function pcSave(list){ try{ localStorage.setItem(PC_KEY, JSON.stringify(list)); }catch(e){} }
+  function pcRender(){
+    var list = pcLoad();
+    if(!list || !list.length){ list = DEFAULT_PC.slice(); pcSave(list); }
+    var host = $("#pcList"); host.textContent = "";
+    list.forEach(function(item, i){
+      var row = document.createElement("div"); row.className = "chk";
+      var lab = document.createElement("label");
+      lab.textContent = item.name;
+      lab.setAttribute("for", "pc-" + i);
+      var sel = document.createElement("select");
+      sel.id = "pc-" + i;
+      STATUSES.forEach(function(s){
+        var o = document.createElement("option");
+        o.value = s; o.textContent = s;
+        if(s === item.status) o.selected = true;
+        sel.appendChild(o);
+      });
+      sel.addEventListener("change", function(){
+        var l = pcLoad() || list;
+        l[i].status = sel.value; pcSave(l); pcRender();
+      });
+      var del = document.createElement("button");
+      del.className = "btn mini"; del.textContent = "Remove";
+      del.addEventListener("click", function(){
+        var l = pcLoad() || list;
+        l.splice(i, 1); pcSave(l); pcRender();
+      });
+      row.appendChild(lab); row.appendChild(sel); row.appendChild(del);
+      host.appendChild(row);
+    });
+    var connected = list.filter(function(x){ return x.status === "connected"; }).length;
+    var pct = list.length ? Math.round(connected / list.length * 100) : 0;
+    $("#pcBar").style.width = pct + "%";
+    $("#pcSummary").textContent = connected + " of " + list.length + " providers marked connected. Marking a provider connected is a declaration by you, not a verification by this page.";
+  }
+  $("#pcAdd").addEventListener("click", function(){
+    var name = $("#pcNew").value.trim();
+    if(!name){ $("#pcSummary").textContent = "Enter a provider name first."; return; }
+    var list = pcLoad() || DEFAULT_PC.slice();
+    list.push({ name: name, status: "unverified" });
+    pcSave(list); $("#pcNew").value = ""; pcRender();
+  });
+  $("#pcReset").addEventListener("click", function(){
+    pcSave(DEFAULT_PC.slice()); pcRender();
+  });
+  pcRender();
+
+  /* ---------- C. Zapier MCP ---------- */
+
+  var ZM_KEY = "lsg.owner.zapierMcpUrl";
+  function zmMask(url){
+    try{
+      var u = new URL(url);
+      return u.protocol + "//" + u.host + "/__REDACTED_PATH__";
+    }catch(e){ return "__INVALID_URL__"; }
+  }
+  function zmRender(){
+    var saved = null;
+    try{ saved = localStorage.getItem(ZM_KEY); }catch(e){}
+    if(saved){
+      $("#zmDel").hidden = false;
+      setOut("zmOut", "Owner Local Reference stored in this browser only.\nMasked view: " + zmMask(saved) + "\nThe full value is never displayed or transmitted.");
+    } else {
+      $("#zmDel").hidden = true;
+      setOut("zmOut", "No local reference stored yet.");
+    }
+  }
+  $("#zmSave").addEventListener("click", function(){
+    var url = $("#zmUrl").value.trim();
+    if(!url){ setOut("zmOut", "Paste your Zapier MCP config URL first."); return; }
+    if(!/^https:\/\//i.test(url)){ setOut("zmOut", "Only https URLs are accepted."); return; }
+    try{ localStorage.setItem(ZM_KEY, url); }catch(e){
+      setOut("zmOut", "Could not save to localStorage in this browser: " + e.message); return;
+    }
+    $("#zmUrl").value = "";
+    zmRender();
+  });
+  $("#zmDel").addEventListener("click", function(){
+    try{ localStorage.removeItem(ZM_KEY); }catch(e){}
+    zmRender();
+  });
+  zmRender();
+
+  var mcResult = "";
+  $("#mcRun").addEventListener("click", function(){
+    var useSaved = $("#mcUseSaved").checked;
+    var saved = null;
+    try{ saved = localStorage.getItem(ZM_KEY); }catch(e){}
+    var urlField = "<your Zapier MCP config URL>";
+    if(useSaved){
+      if(!saved){
+        setOut("mcOut", "You checked the local-URL option but no Owner Local Reference is saved in this browser. Save one in the config tool above, or generate with a placeholder.");
+        return;
+      }
+      urlField = "__OWNER_LOCAL_URL__";
+    }
+    mcResult = JSON.stringify({
+      name: "zapier-mcp",
+      type: "streamable-http",
+      url: urlField,
+      note: "Owner local reference. Do not commit this URL to any repository or share it publicly."
+    }, null, 2);
+    setOut("mcOut", mcResult + (useSaved
+      ? "\n\nTemplate generated with an owner-local marker. The stored URL is inserted only into your clipboard copy, never shown on screen."
+      : "\n\nReplace the placeholder URL with your owner-local Zapier MCP config URL before use."));
+    $("#mcCopy").hidden = false;
+  });
+  $("#mcCopy").addEventListener("click", function(){
+    var useSaved = $("#mcUseSaved").checked;
+    var saved = null;
+    try{ saved = localStorage.getItem(ZM_KEY); }catch(e){}
+    var payload = mcResult;
+    if(useSaved && saved){ payload = mcResult.replace("__OWNER_LOCAL_URL__", saved); }
+    copyText(payload, function(ok){
+      $("#mcCopy").textContent = ok ? "Copied" : "Copy failed";
+      setTimeout(function(){ $("#mcCopy").textContent = "Copy template"; }, 1600);
+    });
+  });
+
+  /* Zapier Export Inspector */
+  var ziResult = "";
+  $("#ziRun").addEventListener("click", function(){
+    var raw = $("#ziIn").value.trim();
+    if(!raw){ setOut("ziOut", "Paste a Zapier export JSON first."); return; }
+    var data;
+    try{ data = JSON.parse(raw); }catch(e){ setOut("ziOut", "Not wired yet for this input: the pasted text is not valid JSON. " + e.message); return; }
+    var zaps = data.zaps || data.results || data.items || (Array.isArray(data) ? data : null);
+    if(!zaps){ setOut("ziOut", "Parsed as JSON, but no zap list found under zaps, results, items, or as a top-level array. Nothing summarized."); return; }
+    var lines = [];
+    zaps.forEach(function(z, i){
+      var title = (z && (z.title || z.name || z.id)) || ("zap-" + (i + 1));
+      var trigger = (z && z.trigger && (z.trigger.name || z.trigger.type)) || "unknown trigger";
+      lines.push((i + 1) + ". " + title + " (trigger: " + trigger + ")");
+      var steps = z && (z.steps || z.actions || (z.zap && z.zap.steps));
+      if(Array.isArray(steps)){
+        steps.forEach(function(s){
+          lines.push("   - action: " + ((s && (s.name || s.type || s.app)) || "unnamed step"));
+        });
+      }
+    });
+    var r = redact(JSON.stringify(zaps));
+    ziResult = "SAFE SUMMARY (auth values not included)\n" + lines.join("\n") +
+      "\n\n" + r.hits + " credential-like value(s) masked in source data.";
+    setOut("ziOut", ziResult);
+    $("#ziCopy").hidden = false;
+  });
+  bindCopy("ziCopy", function(){ return ziResult; });
+
+  /* ---------- D. Control Plane ---------- */
+
+  var LEVELS = ["OBSERVED", "DECLARED", "VALIDATED", "INFERRED"];
+  function parseJson(id, outId){
+    var raw = $("#" + id).value.trim();
+    if(!raw){ setOut(outId, "Paste a JSON input first."); return undefined; }
+    try{ return JSON.parse(raw); }catch(e){ setOut(outId, "Invalid JSON: " + e.message); return undefined; }
+  }
+
+  $("#ecRun").addEventListener("click", function(){
+    var arr = parseJson("ecIn", "ecOut");
+    if(arr === undefined) return;
+    if(!Array.isArray(arr)){ setOut("ecOut", "Input must be a JSON array of evidence entries."); return; }
+    var fails = 0, lines = [];
+    arr.forEach(function(e, i){
+      var problems = [];
+      if(!e || typeof e !== "object"){ problems.push("entry is not an object"); }
+      else {
+        if(!e.claim || typeof e.claim !== "string") problems.push("missing claim");
+        var lvl = (e.level || "").toUpperCase();
+        if(LEVELS.indexOf(lvl) === -1) problems.push("level must be one of " + LEVELS.join(", "));
+        else {
+          if((lvl === "OBSERVED" || lvl === "VALIDATED") && !(e.logRef || e.providerLog)) problems.push(lvl + " requires a logRef or providerLog reference");
+          if(lvl === "DECLARED" && !e.declarer) problems.push("DECLARED requires a declarer");
+          if(lvl === "INFERRED" && !e.basis) problems.push("INFERRED requires a basis");
+        }
+      }
+      var ok = problems.length === 0;
+      if(!ok) fails++;
+      lines.push((ok ? "PASS" : "FAIL") + " entry " + (i + 1) +
+        (e && e.claim ? " (" + String(e.claim).slice(0, 40) + ")" : "") +
+        (ok ? "" : "\n  reasons: " + problems.join("; ")));
+    });
+    setOut("ecOut",
+      (fails === 0 ? "PASS: all " + arr.length + " entries satisfy the evidence contract." : "FAIL: " + fails + " of " + arr.length + " entries violate the contract.") +
+      "\n\n" + lines.join("\n"),
+      fails === 0 ? "pass" : "fail");
+  });
+
+  $("#dvRun").addEventListener("click", function(){
+    var d = parseJson("dvIn", "dvOut");
+    if(d === undefined) return;
+    if(!d || typeof d !== "object"){ setOut("dvOut", "Input must be a JSON object."); return; }
+    var problems = [];
+    if(!d.resource) problems.push("missing resource");
+    if(!d.provider) problems.push("missing provider");
+    if(!d.deploymentId) problems.push("missing deploymentId");
+    if(!(d.logUrl || d.providerLog)) problems.push("missing provider log reference (logUrl or providerLog)");
+    if((d.status === "verified" || d.verified === true) && !(d.logUrl || d.providerLog)) problems.push("claimed verified without a provider log reference, which this gate never accepts");
+    var pass = problems.length === 0;
+    setOut("dvOut",
+      pass
+        ? "PASS: deployment record is complete and carries a provider log reference. This gate validates record completeness only, not live deployment state."
+        : "FAIL: record does not pass the verification gate.\nreasons:\n  - " + problems.join("\n  - "),
+      pass ? "pass" : "fail");
+  });
+
+  $("#ddRun").addEventListener("click", function(){
+    var d = parseJson("ddIn", "ddOut");
+    if(d === undefined) return;
+    if(!d || typeof d !== "object"){ setOut("ddOut", "Input must be a JSON object."); return; }
+    var problems = [];
+    if(!d.task) problems.push("missing task");
+    var done = d.done === true;
+    var evidence = Array.isArray(d.evidence) ? d.evidence : [];
+    if(done && evidence.length === 0) problems.push("done declared with no evidence attached");
+    var validated = evidence.filter(function(e){ return e && (e.level || "").toUpperCase() === "VALIDATED" && (e.ref || e.logRef); });
+    if(done && validated.length === 0) problems.push("done declared without at least one VALIDATED evidence reference");
+    var pass = problems.length === 0;
+    setOut("ddOut",
+      (pass ? "PASS: the declaration is consistent with its evidence." : "FAIL: declaration rejected.\nreasons:\n  - " + problems.join("\n  - ")) +
+      "\n\nVALIDATED evidence found: " + validated.length,
+      pass ? "pass" : "fail");
+  });
+
+  $("#acRun").addEventListener("click", function(){
+    var arr = parseJson("acIn", "acOut");
+    if(arr === undefined) return;
+    if(!Array.isArray(arr)){ setOut("acOut", "Input must be a JSON array of declarations."); return; }
+    var byResource = {};
+    arr.forEach(function(d, i){
+      if(!d || !d.resource || !d.state) return;
+      (byResource[d.resource] = byResource[d.resource] || []).push({ authority: d.authority || ("entry-" + (i + 1)), state: d.state });
+    });
+    var conflicts = [];
+    Object.keys(byResource).forEach(function(res){
+      var states = {};
+      byResource[res].forEach(function(x){ states[x.state] = true; });
+      if(Object.keys(states).length > 1){
+        conflicts.push(res + ": " + byResource[res].map(function(x){ return x.authority + " says " + x.state; }).join(" | "));
+      }
+    });
+    setOut("acOut",
+      conflicts.length === 0
+        ? "PASS: no authority conflicts detected across " + Object.keys(byResource).length + " resource(s)."
+        : "FAIL: " + conflicts.length + " conflicting resource(s):\n\n" + conflicts.join("\n\n"),
+      conflicts.length === 0 ? "pass" : "fail");
+  });
+
+  /* ---------- E. Endpoint probes ---------- */
+  document.querySelectorAll("[data-probe]").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var path = btn.getAttribute("data-probe");
+      var log = $("#probeOut");
+      log.textContent += "GET " + path + " ...\n";
+      fetch(path, { credentials: "include" }).then(function(res){
+        return res.text().then(function(body){
+          var snippet = body ? body.replace(/\s+/g, " ").slice(0, 300) : "(empty body)";
+          log.textContent += "  HTTP " + res.status + "\n  " + snippet + "\n\n";
+        });
+      }).catch(function(err){
+        log.textContent += "  Not wired yet from this context: " + err.message + "\n\n";
+      });
+    });
+  });
+})();
+</script>
+</body>
+</html>
